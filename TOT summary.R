@@ -464,7 +464,7 @@ ggplot(data= subset(yearly_nontarget_catches_toothfish, Species %in% top5_specie
   geom_bar(data= subset(yearly_nontarget_catches_toothfish, Species %in% other_species$Species), aes(x = Year, y = NonTargetCatch, fill="'Other species'"), position="stack", stat="identity") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  labs(title="Yearly bycatch by species in TOT fisheries in the SIOFA area", x="Year", y="Non-target catch (t)") +
+  labs(title="Yearly bycatch by species in TOT fisheries in the SIOFA area", x="Year", y="Bycatch (t)") +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4)
 
 ggsave("TOP summary/SIOFAcatches_nontarget_TOP_web.png", width = 10, height = 5, dpi = 150)
@@ -492,7 +492,7 @@ ggplot(data= subset(yearly_sharks_catches_TOP, Species %in% top5_shark_species$S
   geom_bar(data= subset(yearly_sharks_catches_TOP, Species %in% other_species$Species), aes(x = Year, y = NonTargetCatch, fill="'Other species'"), position="stack", stat="identity") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  labs(title="Yearly bycatch of sharks in TOT fisheries in the SIOFA area", x="Year", y="Non-target catch (t)") +
+  labs(title="Yearly bycatch of sharks in TOT fisheries in the SIOFA area", x="Year", y="Bycatch (t)") +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4)
 
 ggsave("TOP summary/SIOFAcatches_sharks_TOP_web.png", width = 10, height = 6, dpi = 150)
@@ -548,7 +548,7 @@ catch_bycatch_subarea_TOP <- rbind(catch_bycatch_subarea_TOP, target_nontarget_T
 # plot histograms of target and non-target catch in TOP fisheries by year and subarea
 ggplot(catch_bycatch_subarea_TOP, aes(x = Year, y = TargetCatch)) +
   geom_bar(aes(fill=SubAreaNo), position="fill", stat="identity") +
-  labs(title="Yearly target catch in TOT fisheries by SIOFA subareas (relative)", x="Year", y="Target catch (%)") +
+  labs(title="Yearly target catch in TOT fisheries by SIOFA subareas (relative)", x="Year", y="Target catch proportion") +
   scale_fill_brewer(type = "seq", palette = "Set3") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
@@ -558,7 +558,7 @@ ggsave("TOP summary/SIOFAtargetcatch_subarea_TOP_web.png", width = 10, height = 
 
 ggplot(catch_bycatch_subarea_TOP, aes(x = Year, y = NonTargetCatch)) +
   geom_bar(aes(fill=SubAreaNo), position="fill", stat="identity") +
-  labs(title="Yearly bycatch in TOT fisheries by SIOFA subareas (relative)", x="Year", y="Non-target catch (%)") +
+  labs(title="Yearly bycatch in TOT fisheries by SIOFA subareas (relative)", x="Year", y="Bycatch proportion") +
   scale_fill_brewer(type = "seq", palette = "Set3") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
@@ -574,10 +574,10 @@ catch_bycatch_TOP <- catch_bycatch_subarea_TOP %>%
 # plot target/non-target catch totals
 ggplot(catch_bycatch_TOP, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="stack", stat="identity") +
-  labs(title="Yearly catch/bycatch in TOT fisheries in the SIOFA area (absolute)", x="Year", y="Total catch (t)") +
+  labs(title="Yearly target catch/bycatch in TOT fisheries in the SIOFA area (absolute)", x="Year", y="Total catch (t)") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  scale_fill_hue(labels = c("Non-target Catch", "Target Catch")) +
+  scale_fill_hue(labels = c("Non-target Catch", "Target catch")) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("TOP summary/SIOFAcatch_nontargetcatch_TOP_web.png", width = 10, height = 4, dpi = 150)
@@ -585,10 +585,10 @@ ggsave("TOP summary/SIOFAcatch_nontargetcatch_TOP_web.png", width = 10, height =
 # plot target/non-target catch percentage
 ggplot(catch_bycatch_TOP, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly catch/bycatch in TOT fisheries in the SIOFA area (relative)", x="Year", y="Total catch (%)") +
+  labs(title="Yearly target catch/bycatch in TOT fisheries in the SIOFA area (relative)", x="Year", y="Total catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  scale_fill_hue(labels = c("Non-target Catch", "Target Catch")) +
+  scale_fill_hue(labels = c("Non-target Catch", "Target catch")) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("TOP summary/SIOFAcatch_nontargetcatch_TOP_fill_web.png", width = 10, height = 4, dpi = 150)
@@ -626,7 +626,7 @@ ggplot(data= subset(bycatch_TOP_species, Species %in% top5_species$Species), aes
   geom_bar(data= subset(bycatch_TOP_species, Species %in% other_species$Species), aes(x = Year, y = NonTargetCatch, fill="'Other species'"), position="stack", stat="identity") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  labs(title="Yearly non-target catch by species in the fisheries targeting TOP in the SIOFA area", x="Year", y="Non-target catch (t)") +
+  labs(title="Yearly bycatch by species in the fisheries targeting TOP in the SIOFA area", x="Year", y="Bycatch (t)") +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4)
 
 ggsave("TOP summary/SIOFAcatches_nontarget_TOP_web.png", width = 10, height = 5, dpi = 150)
@@ -648,7 +648,7 @@ ggplot(data= subset(yearly_sharks_catches_TOP, Species %in% top5_shark_species$S
   geom_bar(data= subset(yearly_sharks_catches_TOP, Species %in% other_species$Species), aes(x = Year, y = NonTargetCatch, fill="'Other species'"), position="stack", stat="identity") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  labs(title="Yearly bycatch of sharks in TOT fisheries in the SIOFA area", x="Year", y="Non-target catch (t)") +
+  labs(title="Yearly bycatch of sharks in TOT fisheries in the SIOFA area", x="Year", y="Bycatch (t)") +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4)
 
 ggsave("TOP summary/SIOFAcatches_sharks_TOP_web.png", width = 10, height = 6, dpi = 150)
@@ -766,7 +766,7 @@ ggsave("TOP summary/SIOFAtargetcatch_TOP_MUs_fill_web.png", width = 10, height =
 #totals non-target
 ggplot(catch_TOP_MUs, aes(x = Year, y = t)) +
   geom_bar(aes(fill=Management_unit, y=NonTargetCatch), position="stack", stat="identity") +
-  labs(title="Yearly catch of all other species in SIOFA toothfish management units (absolute)", x="Year", y="Catch (t)") +
+  labs(title="Yearly bycatch of all other species in SIOFA toothfish management units (absolute)", x="Year", y="Catch (t)") +
   scale_fill_brewer(type = "seq", palette = "Spectral") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
@@ -801,7 +801,7 @@ catch_bycatch_TOP_MU_across <- catch_bycatch_by_TOP_MU_across %>%
 #percentage of non-target catch in different MUs
 ggplot(catch_bycatch_TOP_MU_across, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly TOP/all other species catch in SIOFA toothfish management units (relative)", x="Year", y="Catch proportion") +
+  labs(title="Yearly TOP target catch/bycatch in SIOFA toothfish management units (relative)", x="Year", y="Catch proportion") +
   scale_fill_brewer(type = "seq", palette = "Spectral") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +

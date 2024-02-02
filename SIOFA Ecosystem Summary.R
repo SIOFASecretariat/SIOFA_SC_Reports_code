@@ -327,7 +327,7 @@ ggsave("Ecosystem Summary/SIOFAcatch_nontargetcatch_web.png", width = 10, height
 #percentage
 ggplot(catch_bycatch, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly target/non-target catch in the SIOFA area (relative)", x="Year", y="Total catch (%)") +
+  labs(title="Yearly target/non-target catch in the SIOFA area (relative)", x="Year", y="Total catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("Non-target Catch", "Target Catch")) +
@@ -353,7 +353,7 @@ ggsave("Ecosystem Summary/SIOFAnontargetcatch_subarea_web.png", width = 10, heig
 #percentage
 ggplot(bycatch_subarea, aes(x = Year, y = t, fill=SubArea)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly non-target catch in SIOFA subareas (relative)", x="Year", y="Non-target catch (%)") +
+  labs(title="Yearly non-target catch in SIOFA subareas (relative)", x="Year", y="Non-target catch proportion") +
   scale_fill_brewer(type = "seq", palette = "Set3") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
@@ -376,10 +376,10 @@ ggsave("Ecosystem Summary/SIOFAcatch_nontargetcatch_sharks_web.png", width = 10,
 #percentage
 ggplot(catch_bycatch_sharks, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly target/non-target catch in the SIOFA area (relative), sharks highlighted", x="Year", y="Total catch (%)") +
+  labs(title="Yearly target/non-target catch in the SIOFA area (relative), sharks highlighted", x="Year", y="Total catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  scale_fill_hue(labels = c("Non-target catch", "Shark target/non-target catch", "Target catch")) +
+  scale_fill_hue(labels = c("Bycatch", "Shark catch", "Target catch")) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("Ecosystem Summary/SIOFAcatch_nontargetcatch_sharks_fill_web.png", width = 10, height = 4, dpi = 150)
@@ -424,7 +424,7 @@ ggsave("Ecosystem Summary/SIOFAcatch_nontargetcatch_discards_web.png", width = 1
 #percentage
 ggplot(catch_bycatch_discards, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly discarded catch as a fraction of non-target catch in the SIOFA area (relative)", x="Year", y="Total non-target catch (%)") +
+  labs(title="Yearly discarded catch as a fraction of non-target catch in the SIOFA area (relative)", x="Year", y="Total non-target catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("Discarded catch", "Non-target catch")) +

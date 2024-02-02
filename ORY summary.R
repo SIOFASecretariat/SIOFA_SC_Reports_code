@@ -339,7 +339,7 @@ catch_bycatch_ORY <- catch_bycatch_ORY %>% pivot_longer(!Year, names_to = "Catch
 # plot target/non-target catch totals
 ggplot(catch_bycatch_ORY, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="stack", stat="identity") +
-  labs(title="Yearly catch/bycatch in ORY fisheries in the SIOFA area (absolute)", x="Year", y="Total catch (t)") +
+  labs(title="Yearly target catch/bycatch in ORY fisheries in the SIOFA area (absolute)", x="Year", y="Total catch (t)") +
   theme_bw() +
   scale_x_continuous(limits=c(2018, 2023)) +
   scale_fill_hue(labels = c("Bycatch", "Catch")) +
@@ -350,7 +350,7 @@ ggsave("ORY summary/SIOFAcatch_nontargetcatch_ORY_web.png", width = 10, height =
 # plot target/non-target catch percentage
 ggplot(catch_bycatch_ORY, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly catch/bycatch in ORY fisheries in the SIOFA area (relative)", x="Year", y="Total catch proportion") +
+  labs(title="Yearly target catch/bycatch in ORY fisheries in the SIOFA area (relative)", x="Year", y="Total catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2018, 2023)) +
   scale_fill_hue(labels = c("Bycatch", "Catch")) +
@@ -509,7 +509,7 @@ catch_bycatch_ORY_MUs <- catch_bycatch_ORY_MUs %>% pivot_longer(!Year, names_to 
 #totals
 ggplot(catch_bycatch_ORY_MUs, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="stack", stat="identity") +
-  labs(title="Yearly catch/bycatch in all SIOFA ORY assessment areas (absolute)", x="Year", y="Total catch (t)") +
+  labs(title="Yearly target catch/bycatch in all SIOFA ORY assessment areas (absolute)", x="Year", y="Total catch (t)") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("Bycatch", "Catch")) +
@@ -520,7 +520,7 @@ ggsave("ORY summary/SIOFAcatch_nontargetcatch_ORY_MUs_web.png", width = 10, heig
 #percentage
 ggplot(catch_bycatch_ORY_MUs, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly catch/bycatch in all SIOFA ORY assessment areas (relative)", x="Year", y="Total catch proportion") +
+  labs(title="Yearly target catch/bycatch in all SIOFA ORY assessment areas (relative)", x="Year", y="Total catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("Bycatch", "Catch")) +
@@ -563,7 +563,7 @@ ggsave("ORY summary/SIOFAtargetcatch_ORY_MUs_fill_web.png", width = 10, height =
 #totals non-target
 ggplot(catch_bycatch_by_ORY_MU, aes(x = Year, y = t)) +
   geom_bar(aes(fill=MU, y=NonTargetCatch), position="stack", stat="identity") +
-  labs(title="Yearly catch of all other species in SIOFA ORY assessment areas (absolute)", x="Year", y="Catch (t)") +
+  labs(title="Yearly bycatch of all other species in SIOFA ORY assessment areas (absolute)", x="Year", y="Bycatch (t)") +
   scale_fill_brewer(type = "seq", palette = "Spectral") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
@@ -654,7 +654,7 @@ combine <- combine %>%
 
 ggplot(combine, aes(x = Year, y = Percentage)) +
   geom_bar(position="stack", stat="identity", fill="blue") +
-  labs(title="% of ORY caught in hauls not identified as targeting ORY", x="Year", y="Catch (%)") +
+  labs(title="% of ORY caught in hauls not identified as targeting ORY", x="Year", y="Catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2019)) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
@@ -827,7 +827,7 @@ catch_bycatch_ORY <- catch_bycatch_ORY %>% pivot_longer(!Year, names_to = "Catch
 # plot target/non-target catch totals
 ggplot(catch_bycatch_ORY, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="stack", stat="identity") +
-  labs(title="Yearly catch/bycatch in ORY fisheries in the SIOFA area (absolute)", x="Year", y="Total catch (t)") +
+  labs(title="Yearly target catch/bycatch in ORY fisheries in the SIOFA area (absolute)", x="Year", y="Total catch (t)") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("Bycatch", "Catch")) +
@@ -838,7 +838,7 @@ ggsave("ORY summary/SIOFAcatch_nontargetcatch_ORY_web.png", width = 10, height =
 # plot target/non-target catch percentage
 ggplot(catch_bycatch_ORY, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly catch/bycatch in ORY fisheries in the SIOFA area (relative)", x="Year", y="Catch proportion") +
+  labs(title="Yearly target catch/bycatch in ORY fisheries in the SIOFA area (relative)", x="Year", y="Catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("Bycatch", "Catch")) +

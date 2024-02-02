@@ -46,7 +46,7 @@ require(rclipboard)
 require(classInt)
 require(viridis)
 require(modelr)
-
+require(ggstats)
 # load data
 setwd("D:/SIOFA/Data")   #### !!!check that this points to the parent folder!!!
 fishing <- read_excel("Catch-effort-2023.xlsx", col_types = c("numeric", "text", "text", "numeric", "numeric", "numeric","numeric","numeric","text","text","text","text","numeric","numeric","numeric","text","text","text","text","numeric","numeric", "numeric","numeric","text"))
@@ -358,7 +358,7 @@ ggplot(data= subset(yearly_nontarget_catches_alfonsino, Species %in% top5_specie
   geom_bar(data= subset(yearly_nontarget_catches_alfonsino, Species %in% other_species$Species), aes(x = Year, y = NonTargetCatch, fill="'Other species'"), position="stack", stat="identity") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  labs(title="Yearly bcatch by species in the fisheries targeting ALF in the SIOFA area", x="Year", y="Non-target catch (t)") +
+  labs(title="Yearly bycatch by species in the fisheries targeting ALF in the SIOFA area", x="Year", y="Bycatch (t)") +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4)
 
 ggsave("BYS summary/SIOFAcatches_nontarget_BYS_web.png", width = 10, height = 5, dpi = 150)
@@ -378,7 +378,7 @@ ggplot(data= yearly_sharks_catches_BYS, aes(x = Year, y = NonTargetCatch)) +
   geom_bar(aes(fill=Species), position="stack", stat="identity") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  labs(title="Yearly bycatch of sharks in the fisheries targeting ALF in the SIOFA area", x="Year", y="Non-target catch (t)") +
+  labs(title="Yearly bycatch of sharks in the fisheries targeting ALF in the SIOFA area", x="Year", y="Bycatch (t)") +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4)
 
 ggsave("BYS summary/SIOFAcatches_sharks_BYS_web.png", width = 10, height = 6, dpi = 150)
@@ -435,7 +435,7 @@ catch_bycatch_subarea_BYS <- rbind(catch_bycatch_subarea_BYS, target_nontarget_B
 # plot histograms of target and non-target catch in BYS fisheries by year and subarea
 ggplot(catch_bycatch_subarea_BYS, aes(x = Year, y = TargetCatch)) +
   geom_bar(aes(fill=SubAreaNo), position="fill", stat="identity") +
-  labs(title="Yearly catch of ALF in fisheries targeting ALF by SIOFA subareas (relative)", x="Year", y="Target catch (%)") +
+  labs(title="Yearly catch of ALF in fisheries targeting ALF by SIOFA subareas (relative)", x="Year", y="Target catch proportion") +
   scale_fill_brewer(type = "seq", palette = "Set3") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
@@ -445,7 +445,7 @@ ggsave("BYS summary/SIOFAtargetcatch_subarea_BYS_web.png", width = 10, height = 
 
 ggplot(catch_bycatch_subarea_BYS, aes(x = Year, y = NonTargetCatch)) +
   geom_bar(aes(fill=SubAreaNo), position="fill", stat="identity") +
-  labs(title="Yearly bycatch in fisheries targeting ALF by SIOFA subareas (relative)", x="Year", y="Non-target catch (%)") +
+  labs(title="Yearly bycatch in fisheries targeting ALF by SIOFA subareas (relative)", x="Year", y="Bycatch proportion") +
   scale_fill_brewer(type = "seq", palette = "Set3") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
@@ -461,10 +461,10 @@ catch_bycatch_BYS <- catch_bycatch_subarea_BYS %>%
 # plot target/non-target catch totals
 ggplot(catch_bycatch_BYS, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="stack", stat="identity") +
-  labs(title="Yearly catch/bycatch in ALF fisheries in the SIOFA area (absolute)", x="Year", y="Total catch (t)") +
+  labs(title="Yearly target catch/bycatch in ALF fisheries in the SIOFA area (absolute)", x="Year", y="Total catch (t)") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  scale_fill_hue(labels = c("Non-target Catch", "Target Catch")) +
+  scale_fill_hue(labels = c("Bycatch", "Target catch")) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("BYS summary/SIOFAcatch_nontargetcatch_BYS_web.png", width = 10, height = 4, dpi = 150)
@@ -472,10 +472,10 @@ ggsave("BYS summary/SIOFAcatch_nontargetcatch_BYS_web.png", width = 10, height =
 # plot target/non-target catch percentage
 ggplot(catch_bycatch_BYS, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly catch/bycatch in ALF fisheries in the SIOFA area (relative)", x="Year", y="Total catch (%)") +
+  labs(title="Yearly target catch/bycatch in ALF fisheries in the SIOFA area (relative)", x="Year", y="Total catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  scale_fill_hue(labels = c("Non-target Catch", "Target Catch")) +
+  scale_fill_hue(labels = c("Bycatch", "Target catch")) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("BYS summary/SIOFAcatch_nontargetcatch_BYS_fill_web.png", width = 10, height = 4, dpi = 150)
@@ -660,7 +660,7 @@ ggsave("BYS summary/SIOFAtargetcatch_BYS_MUs_fill_web.png", width = 10, height =
 #totals non-target
 ggplot(catch_BYS_East_West, aes(x = Year, y = t)) +
   geom_bar(aes(fill=Area, y=NonTargetCatch), position="stack", stat="identity") +
-  labs(title="Yearly catch of all other species in SIOFA ALF assessment areas (absolute)", x="Year", y="Catch (t)") +
+  labs(title="Yearly catch of all other species in SIOFA ALF assessment areas (absolute)", x="Year", y="Bycatch (t)") +
   scale_fill_brewer(type = "seq", palette = "Spectral") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +

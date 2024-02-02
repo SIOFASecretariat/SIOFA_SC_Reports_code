@@ -38,7 +38,7 @@ install.packages("dplyr")
 install.packages('spatstat')
 install.packages("geosphere")
 install.packages("lubridate")
-
+install.packages('ggstats')
 # install package from github
 devtools::install_github("dkahle/ggmap", ref = "tidyup")
 # install klippy for copy-to-clipboard button in code chunks
@@ -93,6 +93,7 @@ require(classInt)
 require(spatstat)
 require(geosphere)
 require(lubridate)
+require(ggstats)
 ## load main fishing data
 setwd("D:/SIOFA/Data")   #### !!!check that this points to the parent folder!!!
 fishing <- read_excel("Catch-effort-2023.xlsx", col_types = c("numeric", "text", "text", "numeric", "numeric", "numeric","numeric","numeric","text","text","text","text","numeric","numeric","numeric","text","text","text","text","numeric","numeric", "numeric","numeric","text"))
@@ -1141,10 +1142,10 @@ write_xlsx(catch_bycatch_sharks_table,"Overview/Tables/catch_bycatch_sharks_tabl
 #totals
 ggplot(catch_bycatch, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="stack", stat="identity") +
-  labs(title="Yearly catch/bycatch in the SIOFA area (absolute)", x="Year", y="Total catch (t)") +
+  labs(title="Yearly target catch/bycatch in the SIOFA area (absolute)", x="Year", y="Total catch (t)") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  scale_fill_hue(labels = c("Bycatch", "Target Catch")) +
+  scale_fill_hue(labels = c("Bycatch", "Target catch")) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("Overview/SIOFAcatch_nontargetcatch_web.png", width = 10, height = 4, dpi = 150)
@@ -1152,10 +1153,10 @@ ggsave("Overview/SIOFAcatch_nontargetcatch_web.png", width = 10, height = 4, dpi
 #percentage
 ggplot(catch_bycatch, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly catch/bycatch in the SIOFA area (relative)", x="Year", y="Total catch proportion") +
+  labs(title="Yearly target catch/bycatch in the SIOFA area (relative)", x="Year", y="Total catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  scale_fill_hue(labels = c("Bycatch", "Catch")) +
+  scale_fill_hue(labels = c("Bycatch", "Target catch")) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("Overview/SIOFAcatch_nontargetcatch_fill_web.png", width = 10, height = 4, dpi = 150)
@@ -1190,7 +1191,7 @@ ggsave("Overview/SIOFAnontargetcatch_subarea__fill_web.png", width = 10, height 
 #totals
 ggplot(catch_bycatch_sharks, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="stack", stat="identity") +
-  labs(title="Yearly catch/bycatch in the SIOFA area (absolute), sharks highlighted", x="Year", y="Total catch (t)") +
+  labs(title="Yearly target catch/bycatch in the SIOFA area (absolute), sharks highlighted", x="Year", y="Total catch (t)") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("Bycatch", "Shark catch", "Catch")) +
@@ -1201,7 +1202,7 @@ ggsave("Overview/SIOFAcatch_nontargetcatch_sharks_web.png", width = 10, height =
 #percentage
 ggplot(catch_bycatch_sharks, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly catch/bycatch in the SIOFA area (relative), sharks highlighted", x="Year", y="Total catch ratio") +
+  labs(title="Yearly target catch/bycatch in the SIOFA area (relative), sharks highlighted", x="Year", y="Total catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("Bycatch", "Shark catch", "Catch")) +
@@ -1382,7 +1383,7 @@ catch_bycatch_ORY_MUs <- catch_bycatch_ORY_MUs %>% pivot_longer(!Year, names_to 
 #totals
 ggplot(catch_bycatch_ORY_MUs, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="stack", stat="identity") +
-  labs(title="Yearly catch/bycatch in all SIOFA ORY assessment areas (absolute)", x="Year", y="Total catch (t)") +
+  labs(title="Yearly target catch/bycatch in all SIOFA ORY assessment areas (absolute)", x="Year", y="Total catch (t)") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("All other species catch", "ORY catch")) +
@@ -1393,7 +1394,7 @@ ggsave("Overview/SIOFAcatch_nontargetcatch_ORY_MUs_web.png", width = 10, height 
 #percentage
 ggplot(catch_bycatch_ORY_MUs, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly catch/bycatch in all SIOFA ORY assessment areas (relative)", x="Year", y="Catch proportion") +
+  labs(title="Yearly target catch/bycatch in all SIOFA ORY assessment areas (relative)", x="Year", y="Total catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("All other species catch", "ORY catch")) +
@@ -1417,7 +1418,7 @@ ggsave("Overview/SIOFAtargetcatch_ORY_MUs_web.png", width = 10, height = 4, dpi 
 #percentage of target catch in different MUs
 ggplot(catch_bycatch_by_ORY_MU, aes(x = Year, y = t)) +
   geom_bar(aes(fill=MU, y=TargetCatch), position="fill", stat="identity") +
-  labs(title="Yearly catch of target species in SIOFA ORY assessment areas (relative)", x="Year", y="Catch (%)") +
+  labs(title="Yearly catch of target species in SIOFA ORY assessment areas (relative)", x="Year", y="Catch proportion") +
   scale_fill_brewer(type = "seq", palette = "Spectral") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
@@ -1518,7 +1519,7 @@ catch_bycatch_TOP_MUs <- catch_bycatch_TOP_MUs %>% pivot_longer(!Year, names_to 
 #totals
 ggplot(catch_bycatch_TOP_MUs, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="stack", stat="identity") +
-  labs(title="Yearly catch/bycatch in all SIOFA TOP management units (absolute)", x="Year", y="Total catch (t)") +
+  labs(title="Yearly target catch/bycatch in all SIOFA TOP management units (absolute)", x="Year", y="Total catch (t)") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("Bycatch", "Target Catch")) +
@@ -1529,7 +1530,7 @@ ggsave("Overview/SIOFAcatch_nontargetcatch_TOP_MUs_web.png", width = 10, height 
 #percentage
 ggplot(catch_bycatch_TOP_MUs, aes(x = Year, y = t, fill=Catch)) +
   geom_bar(position="fill", stat="identity") +
-  labs(title="Yearly catch/bycatch in all SIOFA TOP management units (relative)", x="Year", y="Catch proportion") +
+  labs(title="Yearly target catch/bycatch in all SIOFA TOP management units (relative)", x="Year", y="Catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
   scale_fill_hue(labels = c("Bycatch", "Catch")) +
