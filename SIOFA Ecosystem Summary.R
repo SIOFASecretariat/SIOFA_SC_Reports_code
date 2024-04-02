@@ -121,6 +121,14 @@ ggplot(yearly_global_catches_BPAs, aes(x = Year, y = x)) +
 
 ggsave("Ecosystem Summary/SIOFAcatch_BPAs_full_web.png", width = 10, height = 5, dpi = 150)
 
+global_catches_BPAs_table <- yearly_global_catches_BPAs %>%
+  group_by(Species) %>%
+  summarise('Total weight (t)' = sum(x)) %>%
+  mutate_at(vars('Total weight (t)'), funs(round(., 1)))
+  
+write_xlsx(global_catches_BPAs_table,"Ecosystem Summary/Tables/global_catches_BPAs_table.xlsx")
+
+
 ## plot histogram of gear used per year in BPAs
 # count fishing events by gear
 yearly_gear_used_BPAs <- fishing_within_BPAs
@@ -206,6 +214,13 @@ ggplot(VME_bycatch_year, aes(x = Year, y = x)) +
 
 ggsave("Ecosystem Summary/SIOFAcatch_VMEs_cropped_web.png", width = 10, height = 4, dpi = 150)
 
+VME_bycatch_year_table <- VME_bycatch_year %>%
+  group_by(Group) %>%
+  summarise('Total weight (kg)' = sum(x))  %>%
+  rename(Taxon=Group) %>%
+  mutate_at(vars('Total weight (kg)'), funs(round(., 2)))
+
+write_xlsx(VME_bycatch_year_table,"Ecosystem Summary/Tables/VME_bycatch_year_table.xlsx")
 
 #map of VME bycatch by taxon and weight, need to do it by subarea
 VME_spatial <- filter(VME_bycatch_groomed, (!is.na(VME_bycatch_groomed$Longitude)))
@@ -252,10 +267,11 @@ yearly_global_catches_subarea <- aggregate(fishing_within$CatchTon, by=list(Year
 yearly_global_catches_subarea_species <- aggregate(fishing_within$CatchTon, by=list(Year=fishing_within$Year,SubArea=fishing_within$SubAreaNo, Species=fishing_within$SpeciesCode), FUN=sum, na.rm = TRUE)
 #calculate total target catch per year
 target_species <- read_excel("targets.xlsx")
-yearly_global_catches_target <- filter(yearly_global_catches_species, Species %in% target_species$"FAO Code")
+target_species_revised <- read_excel("targets_primary_secondary.xlsx")
+yearly_global_catches_target <- filter(yearly_global_catches_species, Species %in% target_species_revised$"FAO Code")
 yearly_global_catches_target <- aggregate(yearly_global_catches_target$x, by=list(Year=yearly_global_catches_target$Year), FUN=sum, na.rm = TRUE)
 #calculate total target catch per year and subarea
-yearly_global_catches_subarea_target <- filter(yearly_global_catches_subarea_species, Species %in% target_species$"FAO Code")
+yearly_global_catches_subarea_target <- filter(yearly_global_catches_subarea_species, Species %in% target_species_revised$"FAO Code")
 yearly_global_catches_subarea_target <- aggregate(yearly_global_catches_subarea_target$x, by=list(Year=yearly_global_catches_subarea_target$Year,SubArea=yearly_global_catches_subarea_target$SubArea), FUN=sum, na.rm = TRUE)
 #subtract total target catch from total catch per subarea
 names(yearly_global_catches_target)[names(yearly_global_catches_target) == "x"] <- "TargetCatch"
@@ -442,6 +458,13 @@ ggplot(data=yearly_global_catches_discards_species, aes(x = Year, y = x)) +
 
 ggsave("Ecosystem Summary/SIOFAdiscards_species_web.png", width = 15, height = 6, dpi = 150) 
 
+discards_species_table <- yearly_global_catches_discards_species %>%
+  group_by(Species) %>%
+  summarise('Total weight (t)' = sum(x)) %>%
+  mutate_at(vars('Total weight (t)'), funs(round(., 1)))
+
+write_xlsx(discards_species_table,"Ecosystem Summary/Tables/discards_species_table.xlsx")
+
 #discards by species, top5 species + others aggregated
 sort_discards <- aggregate(yearly_global_catches_discards_species$x, by=list(Species=yearly_global_catches_discards_species$Species), FUN=sum, na.rm = TRUE)
 
@@ -537,6 +560,14 @@ ggplot(data= subset(yearly_global_catches_sharks, Species %in% top5_sharks$Speci
 
 ggsave("Ecosystem Summary/SIOFAcatches_effort_SHA_top5_web.png", width = 10, height = 6, dpi = 150)  
 
+global_catches_sharks_table <- yearly_global_catches_sharks %>%
+  group_by(Species) %>%
+  summarise('Total weight (t)' = sum(x)) %>%
+  mutate_at(vars('Total weight (t)'), funs(round(., 1)))
+
+write_xlsx(global_catches_sharks_table,"Ecosystem Summary/Tables/global_catches_sharks_table.xlsx")
+
+
 ggplot(yearly_global_catches_subarea_sharks, aes(x = Year, y = x)) +
   geom_bar(aes(fill=SubArea), position="stack", stat="identity") +
   labs(title="Yearly shark catch by SIOFA subarea", x="Year", y="Catch (t)") +
@@ -546,6 +577,8 @@ ggplot(yearly_global_catches_subarea_sharks, aes(x = Year, y = x)) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("Ecosystem Summary/SIOFAcatches_SHA_subarea_web.png", width = 10, height = 4, dpi = 150)
+
+
 
 ## subset for CMM 12 shark only data 
 # !!!!! here I use the Annex 1 of CMM 12 from both 2019 and 2023 as a list of sharks
@@ -830,6 +863,13 @@ observer_coverage_table <- observer_coverage %>%
   dplyr::select(Year, "Fishing gear", "Total events", "Observed events", "% observed")
   
 write_xlsx(observer_coverage_table,"Ecosystem summary/Tables/observer_coverage.xlsx")
+
+observer_coverage_table_2 <- fishing %>%
+  filter(Year > 2017) %>%
+  group_by(Gear, Year, NbTows, NbSets) %>%
+  summarise(TotalEvents = n_distinct(ActivityID))
+
+write_xlsx(observer_coverage_table_2,"Ecosystem summary/Tables/observer_coverage_table_2.xlsx")
 
 ## analysis of observer reported catches
 # need to assign subarea to reported locations

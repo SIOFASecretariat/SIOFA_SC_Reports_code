@@ -59,6 +59,9 @@ fishing_boundaries <- st_read('siofa_subareas_edited')
 # drop 2023 data (still incomplete)
 fishing <- fishing %>%
   filter(Year<=2022)
+# drop 2023 data, if any, as it is still incomplete
+Observer_data <- Observer_data %>%
+  filter(Year<=2022)
 
 # get a feel for the data as currently is
 class(fishing_boundaries)
@@ -1070,9 +1073,10 @@ write_xlsx(countries_observing_ORY,"ORY summary/Tables/countries_observing_ORY.x
 # measures of maturity, sex and weight, and otoliths collected for ORY
 measured_fish_ORY <- Observer_data %>%
   #filter(Year>=2013) %>%
-  filter((species3ACode == "ORY") | (species3ACode == "HPR") | (species3ACode == "FSZ")) %>%
+  filter((species3ACode=="ORY")|(species3ACode=="HPR")|(species3ACode=="FSZ")) %>%
   group_by(Year) %>%
-  summarise_all(funs(sum(.>=0)), na.rm = TRUE) %>%
+  #summarise_all(funs(sum(!is.na(.)))) %>%
+  summarise_all(funs(sum(!is.na(.)))) %>%
   dplyr::select(Year, bsLength, bsWeight,bsOtolithCollected,bsSex,bsMaturity,bsGonadWeight,bsStomachSampled) %>%
   rename('Maturity (n)'=bsMaturity) %>%
   rename('Sex (n)'=bsSex) %>%

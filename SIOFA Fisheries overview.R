@@ -39,11 +39,13 @@ install.packages('spatstat')
 install.packages("geosphere")
 install.packages("lubridate")
 install.packages('ggstats')
+install.packages('rlang')
 # install package from github
 devtools::install_github("dkahle/ggmap", ref = "tidyup")
 # install klippy for copy-to-clipboard button in code chunks
 remotes::install_github("rlesur/klippy")
 
+update.packages(ask = FALSE)
 
 # set options
 options(stringsAsFactors = F)         # no automatic data transformation
@@ -94,14 +96,18 @@ require(spatstat)
 require(geosphere)
 require(lubridate)
 require(ggstats)
+
 ## load main fishing data
 setwd("D:/SIOFA/Data")   #### !!!check that this points to the parent folder!!!
 fishing <- read_excel("Catch-effort-2023.xlsx", col_types = c("numeric", "text", "text", "numeric", "numeric", "numeric","numeric","numeric","text","text","text","text","numeric","numeric","numeric","text","text","text","text","numeric","numeric", "numeric","numeric","text"))
-
+Observer_data <- read_excel("qry_overview_full_bio_sampling_data_2023.xlsx")
 fishing_boundaries <- st_read('siofa_subareas_edited')
+
 
 # drop 2023 data, if any, as it is still incomplete
 fishing <- fishing %>%
+  filter(Year<=2022)
+Observer_data <- Observer_data %>%
   filter(Year<=2022)
 
 # get a feel for the data as currently is
@@ -1084,10 +1090,11 @@ ggsave("Overview/SIOFA_CPUEs_WHA_web.png", width = 10, height = 4, dpi = 150)
 #get the data ready to plot
 #calculate total target catch per year
 target_species <- read_excel("targets.xlsx")
-yearly_global_catches_target <- filter(yearly_global_catches_species, Species %in% target_species$"FAO Code")
+target_species_revised <- read_excel("targets_primary_secondary.xlsx")
+yearly_global_catches_target <- filter(yearly_global_catches_species, Species %in% target_species_revised$"FAO Code")
 yearly_global_catches_target <- aggregate(yearly_global_catches_target$x, by=list(Year=yearly_global_catches_target$Year), FUN=sum, na.rm = TRUE)
 #calculate total target catch per year and subarea
-yearly_global_catches_subarea_target <- filter(yearly_global_catches_subarea_species, Species %in% target_species$"FAO Code")
+yearly_global_catches_subarea_target <- filter(yearly_global_catches_subarea_species, Species %in% target_species_revised$"FAO Code")
 yearly_global_catches_subarea_target <- aggregate(yearly_global_catches_subarea_target$x, by=list(Year=yearly_global_catches_subarea_target$Year,SubArea=yearly_global_catches_subarea_target$SubArea), FUN=sum, na.rm = TRUE)
 #subtract total target catch from total catch per subarea
 names(yearly_global_catches_target)[names(yearly_global_catches_target) == "x"] <- "TargetCatch"
@@ -1354,11 +1361,11 @@ yearly_ORY_MUs_global_catches <- aggregate(fishing_within_ORY_MUs$CatchTon, by=l
 yearly_ORY_MUs_total_catches_MU <- aggregate(fishing_within_ORY_MUs$CatchTon, by=list(Year=fishing_within_ORY_MUs$Year,MU=fishing_within_ORY_MUs$name), FUN=sum, na.rm = TRUE)
 
 #calculate only target catch per year within all MUs
-yearly_ORY_MUs_catches_target <- filter(yearly_MUs_global_catches_ORY_MUs, Species %in% target_species$"FAO Code")
+yearly_ORY_MUs_catches_target <- filter(yearly_MUs_global_catches_ORY_MUs, Species %in% target_species_revised$"FAO Code")
 yearly_ORY_MUs_catches_target <- aggregate(yearly_ORY_MUs_catches_target$x, by=list(Year=yearly_ORY_MUs_catches_target$Year), FUN=sum, na.rm = TRUE)
 
 #calculate only target catch per year and MU
-yearly_ORY_MUs_catches_MU_target <- filter(yearly_MUs_global_catches_ORY_MUs, Species %in% target_species$"FAO Code")
+yearly_ORY_MUs_catches_MU_target <- filter(yearly_MUs_global_catches_ORY_MUs, Species %in% target_species_revised$"FAO Code")
 yearly_ORY_MUs_catches_MU_target <- aggregate(yearly_ORY_MUs_catches_MU_target$x, by=list(Year=yearly_ORY_MUs_catches_MU_target$Year, MU=yearly_ORY_MUs_catches_MU_target$MU), FUN=sum, na.rm = TRUE)
 
 #subtract total target catch from total catch within MUs
@@ -1386,7 +1393,7 @@ ggplot(catch_bycatch_ORY_MUs, aes(x = Year, y = t, fill=Catch)) +
   labs(title="Yearly target catch/bycatch in all SIOFA ORY assessment areas (absolute)", x="Year", y="Total catch (t)") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  scale_fill_hue(labels = c("All other species catch", "ORY catch")) +
+  scale_fill_hue(labels = c("All other species catch", "Target species catch")) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("Overview/SIOFAcatch_nontargetcatch_ORY_MUs_web.png", width = 10, height = 4, dpi = 150)
@@ -1397,7 +1404,7 @@ ggplot(catch_bycatch_ORY_MUs, aes(x = Year, y = t, fill=Catch)) +
   labs(title="Yearly target catch/bycatch in all SIOFA ORY assessment areas (relative)", x="Year", y="Total catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  scale_fill_hue(labels = c("All other species catch", "ORY catch")) +
+  scale_fill_hue(labels = c("All other species catch", "Target species catch")) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("Overview/SIOFAcatch_nontargetcatch_ORY_MUs_fill_web.png", width = 10, height = 4, dpi = 150)
@@ -1490,11 +1497,11 @@ yearly_TOP_MUs_global_catches <- aggregate(fishing_within_TOP_MUs$CatchTon, by=l
 yearly_TOP_MUs_total_catches_MU <- aggregate(fishing_within_TOP_MUs$CatchTon, by=list(Year=fishing_within_TOP_MUs$Year, MU=fishing_within_TOP_MUs$area_name), FUN=sum, na.rm = TRUE)
 
 #calculate only target catch per year within all MUs
-yearly_TOP_MUs_catches_target <- filter(yearly_MUs_global_catches_TOP_MUs, Species %in% target_species$"FAO Code")
+yearly_TOP_MUs_catches_target <- filter(yearly_MUs_global_catches_TOP_MUs, Species %in% target_species_revised$"FAO Code")
 yearly_TOP_MUs_catches_target <- aggregate(yearly_TOP_MUs_catches_target$x, by=list(Year=yearly_TOP_MUs_catches_target$Year), FUN=sum, na.rm = TRUE)
 
 #calculate only target catch per year and MU
-yearly_TOP_MUs_catches_MU_target <- filter(yearly_MUs_global_catches_TOP_MUs, Species %in% target_species$"FAO Code")
+yearly_TOP_MUs_catches_MU_target <- filter(yearly_MUs_global_catches_TOP_MUs, Species %in% target_species_revised$"FAO Code")
 yearly_TOP_MUs_catches_MU_target <- aggregate(yearly_TOP_MUs_catches_MU_target$x, by=list(Year=yearly_TOP_MUs_catches_MU_target$Year,MU=yearly_TOP_MUs_catches_MU_target$MU), FUN=sum, na.rm = TRUE)
 
 #subtract total target catch from total catch within MUs
@@ -1503,6 +1510,7 @@ names(yearly_TOP_MUs_global_catches)[names(yearly_TOP_MUs_global_catches) == "x"
 catch_bycatch_TOP_MUs <- full_join(yearly_TOP_MUs_global_catches, yearly_TOP_MUs_catches_target)
 catch_bycatch_TOP_MUs <- catch_bycatch_TOP_MUs %>%  mutate(NonTargetCatch = TotalCatch-TargetCatch)
 catch_bycatch_TOP_MUs$TotalCatch <- NULL
+catch_bycatch_TOP_MUs <- pmax(catch_bycatch_TOP_MUs,0)
 
 #subtract total target catch from total catch within EACH MU
 names(yearly_TOP_MUs_catches_MU_target)[names(yearly_TOP_MUs_catches_MU_target) == "x"] <- "TargetCatch"
@@ -1510,6 +1518,7 @@ names(yearly_TOP_MUs_total_catches_MU)[names(yearly_TOP_MUs_total_catches_MU) ==
 catch_bycatch_by_TOP_MU <- full_join(yearly_TOP_MUs_catches_MU_target, yearly_TOP_MUs_total_catches_MU)
 catch_bycatch_by_TOP_MU <- catch_bycatch_by_TOP_MU%>% mutate(NonTargetCatch = TotalCatch-TargetCatch)
 catch_bycatch_by_TOP_MU$TotalCatch <- NULL
+catch_bycatch_by_TOP_MU <- pmax(catch_bycatch_by_TOP_MU,0)
 
 #transform data for easier plotting
 catch_bycatch_TOP_MUs <- catch_bycatch_TOP_MUs %>% pivot_longer(!Year, names_to = "Catch", values_to = "t")
@@ -1522,7 +1531,7 @@ ggplot(catch_bycatch_TOP_MUs, aes(x = Year, y = t, fill=Catch)) +
   labs(title="Yearly target catch/bycatch in all SIOFA TOP management units (absolute)", x="Year", y="Total catch (t)") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  scale_fill_hue(labels = c("Bycatch", "Target Catch")) +
+  scale_fill_hue(labels = c("All other species catch", "Target species catch")) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("Overview/SIOFAcatch_nontargetcatch_TOP_MUs_web.png", width = 10, height = 4, dpi = 150)
@@ -1533,7 +1542,7 @@ ggplot(catch_bycatch_TOP_MUs, aes(x = Year, y = t, fill=Catch)) +
   labs(title="Yearly target catch/bycatch in all SIOFA TOP management units (relative)", x="Year", y="Catch proportion") +
   theme_bw() +
   scale_x_continuous(limits=c(2012, 2023)) +
-  scale_fill_hue(labels = c("Bycatch", "Catch")) +
+  scale_fill_hue(labels = c("All other species catch", "Target species catch")) +
   theme(plot.title = element_text(hjust = 0.5), aspect.ratio=0.4) 
 
 ggsave("Overview/SIOFAcatch_nontargetcatch_TOP_MUs_fill_web.png", width = 10, height = 4, dpi = 150)
@@ -1868,8 +1877,9 @@ ggsave("Overview/SIOFAcatches_special_web.png", width = 10, height = 4, dpi = 15
 
 avg_ORY_2018_2022 <- filter(yearly_global_catches_species_special_ORY, (Year >= 2018))
 avg_ORY_2018_2022 <- sum(avg_ORY_2018_2022$x)/5
-avg_ORY_2017_2022 <- filter(yearly_global_catches_species_special_ORY, (Year >= 2017))
-avg_ORY_2017_2022 <- sum(avg_ORY_2017_2022$x)/6
+avg_ORY_2015_2020 <- filter(yearly_global_catches_species_special_ORY, (Year >= 2015))
+avg_ORY_2015_2020 <- filter(avg_ORY_2015_2020, (Year <= 2020))
+avg_ORY_2015_2020 <- sum(avg_ORY_2015_2020$x)/6
 
 avg_ALF_2018_2022 <- filter(yearly_global_catches_species_special_ALF, (Year >= 2018))
 avg_ALF_2018_2022 <- sum(avg_ALF_2018_2022$x)/5
@@ -2079,8 +2089,10 @@ ggplot() +
 
 ggsave("Overview/SIOFAmap_CCAMLR_tags_web.png", width = 8, height = 6, dpi = 150)
 
-## analyze observer data
-Observer_data <- read_excel("qry_overview_full_bio_sampling_data_2023.xlsx")
+### analyze observer data
+
+## calculate fraction of fish of catch measured for length for SIOFA key species
+
 # calculate number of fish of SIOFA key species measured 
 # for length by Scientific Observers 
 observed_lengths_target_table <- Observer_data %>%
@@ -2094,18 +2106,15 @@ observed_lengths_target_table <- Observer_data %>%
   filter(Year>=2013) %>%
   rename('Scientific name'=speciesScientificName) %>%
   arrange(Year,species3ACode, .by_group = FALSE) %>%
-  rename('FAO code'=species3ACode) %>%
+  rename(FAOcode=species3ACode) %>%
   rename('Common name'=speciesEnglishName) %>%
   #rename('Individuals measured'=n) %>%
   pivot_wider(names_from = Year, values_from = n) %>%
   replace(is.na(.), 0) %>%
   mutate(Total = rowSums(across(where(is.numeric)))) 
 
-write_xlsx(observed_lengths_target_table,"Overview/Tables/target_lengths_table.xlsx")
 
-# calculate fraction of fish of catch measured for length 
-# for SIOFA key species 
-# need to get number of fish measured per year (from previous section)
+# calculate average weight of fish measured per year by species
 observed_lengths_target_weight_table <- Observer_data %>%
   group_by(species3ACode,speciesEnglishName,speciesScientificName,Year) %>%
   filter(species3ACode== "ORY"| species3ACode== "BXD"| species3ACode== "BYS"|  
@@ -2113,23 +2122,27 @@ observed_lengths_target_weight_table <- Observer_data %>%
            species3ACode== "TOA"| species3ACode== "WHA"| species3ACode== "WRF"| 
            species3ACode== "HAU") %>%
   filter(bsWeight>=0) %>%
-  summarise(AvgWeight = mean(bsWeight)) %>%
+  summarise(AvgWeight = mean(bsWeight, trim=0.05)) %>%
   filter(Year>=2013) %>%
   rename('Scientific name'=speciesScientificName) %>%
   arrange(Year,species3ACode, .by_group = FALSE) %>%
-  rename('FAO code'=species3ACode) %>%
+  rename(FAOcode=species3ACode) %>%
   rename('Common name'=speciesEnglishName) %>%
   #rename('Individuals measured'=n) %>%
   pivot_wider(names_from = Year, values_from = AvgWeight) %>%
   replace(is.na(.), 0) 
-# then multiply this number by the average weight measured in that year
+
+# then multiply this number by the number of individuals measured in that year
+# convert weight to tonnes
 MW <- observed_lengths_target_weight_table
 i <- 4
-while(i <=14) {                  # Start while-loop
+while(i <=13) {                  # Start while-loop
   MW[ , i] <- (observed_lengths_target_table[ , i] * MW[ ,i])/1000
   i <- i + 1
 }
+
 # then express this as a fraction of the catch for that species in that year
+# calculate cumulative catch by species
 cumulative_catch_table <- fishing %>%
   group_by(SpeciesCode,SpeciesEngName,SpeciesScName,Year) %>%
   filter(SpeciesCode== "ORY"| SpeciesCode== "BXD"| SpeciesCode== "BYS"|  
@@ -2139,17 +2152,23 @@ cumulative_catch_table <- fishing %>%
   filter(CatchTon>=0) %>%
   summarise(TotalCatch = sum(CatchTon)) %>%
   filter(Year>=2013) %>%
-  arrange(SpeciesCode, Year, .by_group = TRUE) %>%
+  arrange( Year,SpeciesCode, .by_group = FALSE) %>%
   pivot_wider(names_from = Year, values_from = TotalCatch) %>%
-  replace(is.na(.), 0) 
+  replace(is.na(.), 0)
+
 # since the two tables are not matching species, need to remove
 # the species that was not measured in catches
 species_cumulative_catch_table <- cumulative_catch_table %>%
   filter(SpeciesCode!= "HAU") %>%
   dplyr::select(SpeciesCode,SpeciesEngName,SpeciesScName,
          '2013','2014','2015','2016','2017','2018','2019',
-         '2020', '2021', '2022') # need to manually add years
-# finally calculate ratio
+         '2020', '2021', '2022') %>%# need to manually add years
+  arrange(SpeciesCode)
+  
+# make sure the other table has species in the same order
+MW <- MW %>% arrange(FAOcode)
+
+# finally calculate ratio/% of measured fish
 MWratio <- MW
 i <- 4
 while(i <=13) {                  # Start while-loop
@@ -2160,9 +2179,15 @@ MWratio[sapply(MWratio, is.infinite)] <- NA
 MWratio <- MWratio %>%
   replace(is.na(.), 0) %>%
   #rename('FAO code'=SpeciesCode) %>%
-  mutate_if(is.numeric, ~round(., 3))
+  mutate_if(is.numeric, ~round(., 3)) %>%
+  #mutate(across(.>100), 100) %>%
+  rename('FAO code'=FAOcode)
+
+observed_lengths_target_table <- observed_lengths_target_table %>%
+  rename('FAO code'=FAOcode)
 
 write_xlsx(MWratio,"Overview/Tables/MWratio.xlsx")
+write_xlsx(observed_lengths_target_table,"Overview/Tables/target_lengths_table.xlsx")
 
 # calculate number of fish of SIOFA non key species measured 
 # for length by Scientific Observers 
@@ -2195,9 +2220,9 @@ write_xlsx(observed_lengths_nontarget_table,"Overview/Tables/non_target_lengths_
 observed_fish_other_table <- Observer_data %>%
   filter(Year>=2013) %>%
   group_by(species3ACode,speciesEnglishName,speciesScientificName) %>%
-  summarise(Maturity = sum(bsMaturity>=0), 
-            Sex = sum(bsSex>=0),
-            Weight = sum(bsWeight>=0)) %>%
+  summarise(Maturity = sum(!is.na(bsMaturity)), 
+            Sex = sum(!is.na(bsSex)),
+            Weight = sum(!is.na(bsWeight))) %>%
   rename('Scientific name'=speciesScientificName) %>%
   rename('FAO code'=species3ACode) %>%
   rename('Common name'=speciesEnglishName) %>%
@@ -2228,10 +2253,10 @@ observed_sharks_CMM_table <- Observer_data %>%
   filter(Year>=2013) %>%
   filter(species3ACode %in% shark_species_CMM$FAOcode) %>%
   group_by(species3ACode,speciesEnglishName,speciesScientificName) %>%
-  summarise('Maturity (n)' = sum(bsMaturity>=0), 
-            'Sex (n)' = sum(bsSex>=0),
-            'Length (n)' = sum(bsLength>=0), 
-            'Weight (n)' = sum(bsWeight>=0)) %>%
+  summarise('Maturity (n)' = sum((!is.na(bsMaturity)), na.rm = TRUE), 
+            'Sex (n)' = sum((!is.na(bsSex)), na.rm = TRUE),
+            'Length (n)' = sum((!is.na(bsLength)), na.rm = TRUE), 
+            'Weight (n)' = sum((!is.na(bsWeight)), na.rm = TRUE)) %>%
   rename('Scientific name'=speciesScientificName) %>%
   rename('FAO code'=species3ACode) %>%
   rename('Common name'=speciesEnglishName) %>%
